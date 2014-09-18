@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h4>Fiscal</h4>
+
+<p data-bind="if:!cargaFinalizada()">
+    Cargando datos...
+</p>
+
+<div id="main" data-bind="if:cargaFinalizada">
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <div data-bind="template:{name:'inputKeyboard', if:!touchDevice}"></div>
+            <div data-bind="template:{name:'inputTouch', if:touchDevice, afterRender: initTouchKeyboard}"></div>
+        </div>
+        <div class="col-xs-12 col-sm-8">
+            <div class="row">
+                <div class="col-sm-12" data-bind="template: 'message'"></div>
+                <div class="col-sm-12">
+                    <table class="table table-condensed">
+                        <colgroup>
+                            <col style="width:30%" />
+                            <col style="width:50%" />
+                            <col style="width:10%" />
+                            <col style="width:10%" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Dni
+                                </th>
+                                <th>
+                                    Nombre
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: resultadoBusqueda">
+                            <tr>
+                                <td data-bind="text: DNI"></td>
+                                <td data-bind="text: Nombre"></td>
+                                <td>
+                                    @*<input type="checkbox" data-bind="enable:typeof(InSyncObservable)=='undefined' || InSyncObservable(), checked: PunteadoObservable, attr: {id: 'punteado_' + Id }" />*@
+                                    <input type="checkbox" data-bind="checked: PunteadoObservable, attr: {id: 'punteado_' + Id }" />
+                                </td>
+                                <td>
+                                    <span data-bind="visible:!(typeof(InSyncObservable)=='undefined' || InSyncObservable())"><i class="glyphicon glyphicon-cloud-upload"></i></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+    </div>
+
+    <div class="row">
+    </div>
+</div>
+
+<script id="inputKeyboard" type="text/html">
+    <form class="form-horizontal" data-bind="submit: keyboard.automarcar">
+        <div class="form-group">
+            <div class="col-sm-8">
+                <div class="numero-actual">
+                    <div class="input-group">
+                        <input class="form-control" type="number" data-bind="textInput: id" />
+                        <span class="input-group-btn">
+                            <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar, css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok"></i></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</script>
+<script id="inputTouch" type="text/html">
+    <div class="row touchKeyboard">
+        <div class="col-sm-12">
+            <div id="keyboard" class="touchKeyboard">
+                <div class="key-row">
+                    <button type="button" value=1 class="btn btn-default key-numero">1</button>
+                    <button type="button" value=2 class="btn btn-default key-numero">2</button>
+                    <button type="button" value=3 class="btn btn-default key-numero">3</button>
+                </div>
+                <div class="key-row">
+                    <button type="button" value=4 class="btn btn-default key-numero">4</button>
+                    <button type="button" value=5 class="btn btn-default key-numero">5</button>
+                    <button type="button" value=6 class="btn btn-default key-numero">6</button>
+                </div>
+                <div class="key-row">
+                    <button type="button" value=7 class="btn btn-default key-numero">7</button>
+                    <button type="button" value=8 class="btn btn-default key-numero">8</button>
+                    <button type="button" value=9 class="btn btn-default key-numero">9</button>
+                </div>
+                <div class="key-row">
+                    <button type="button" class="btn btn-default key-back"><i class="glyphicon glyphicon-arrow-left"></i></button>
+                    <button type="button" value=0 class="btn btn-default key-numero">0</button>
+                    <button type="button" class="btn btn-lg btn-default key-remove"><i class="glyphicon glyphicon-remove"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2 col-sm-10 col-sm-offset-0">
+            <form class=" form-horizontal" data-bind="submit: keyboard.automarcar">
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="numero-actual">
+                            <div class="input-group">
+                                <span class="form-control" data-bind="text: id"></span>
+                                <span class="input-group-btn">
+                                    <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar, css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+
+<script id="message" type="text/html">
+    <div class="alert" data-bind="css: 'alert-' + messageStatus()">
+        <p data-bind="text:message"></p>
+    </div>
+</script>
+@section scripts
+{
+    <script src="~/Scripts/App/Data/dataContext.js"></script>
+    <script src="~/Scripts/App/utils.js"></script>
+    <script src="~/Scripts/App/Fiscal/Index.js"></script>
+}
+
+<style>
+    .touchKeyboard input {
+        width: 192px;
+    }
+
+    .key-row > button {
+        margin: 3px 0 0 0;
+        width: 31%;
+        height: 50px;
+    }
+
+    .numero-actual {
+        margin-top: 5px;
+    }
+</style>
