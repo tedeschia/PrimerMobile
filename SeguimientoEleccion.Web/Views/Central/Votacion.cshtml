@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutNoCache.cshtml";
+    ViewBag.Title = "Estadisticas";
+}
+
+<div class="page-header">
+    <h4>Central</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="chart"></div>
+    </div>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/kendo.dataviz")
+    <script src="~/Scripts/App/Central/Votacion.js"></script>
+}

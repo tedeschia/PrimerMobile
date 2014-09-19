@@ -104,6 +104,8 @@ namespace SeguimientoEleccion.Web.Migrations
                     new Colegio {Nombre = "ZAPALA", Usuario = "Zapa15402"},
                     new Colegio {Nombre = "ZARATE- CAMPANA", Usuario = "Zara44068"},
                 });
+
+
         }
         bool AddUserAndRole(SeguimientoEleccion.Web.Models.ApplicationDbContext context)
         {

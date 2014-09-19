@@ -7,6 +7,7 @@
 
 <div class="page-header">
     <h4>Punteados</h4>
+    <h3>@ViewBag.Colegio</h3>
 </div>
 
 <table class="table table-condensed table-bordered">
@@ -18,7 +19,7 @@
             @Html.DisplayNameFor(model => model.Nombre)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Colegio)
+            @Html.DisplayNameFor(model => model.Referente)
         </th>
     </tr>
 
@@ -31,7 +32,7 @@
             @Html.DisplayFor(modelItem => item.Nombre)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Colegio)
+            @Html.DisplayFor(modelItem => item.Referente)
         </td>
     </tr>
 }

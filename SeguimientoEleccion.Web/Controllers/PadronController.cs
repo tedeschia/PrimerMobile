@@ -25,26 +25,23 @@ namespace SeguimientoEleccion.Web.Controllers
         public PadronViewModel GetPadron(string usuario)
         {
             //Thread.Sleep(10000);
-            var colegio = db.Colegios
-                .Where(c=>c.Usuario == usuario)
-                .Select(c=>c.Nombre)
-                .FirstOrDefault();
+            var colegio = db.Colegios.FirstOrDefault(c => c.Usuario == usuario);
 
             return new PadronViewModel()
                    {
                        Padron =
                            colegio != null
-                               ? db.Electores.Where(e => colegio == e.Colegio)
+                               ? db.Electores.Where(e => colegio.Id == e.ColegioId)
                                .Select(e=>new PadronViewModel.ElectorViewModel()
                                           {
                                               Id=e.Id,
                                               Nombre = e.Nombre,
                                               DNI = e.DNI,
-                                              Punteado = e.Punteado
+                                              Punteado = e.Voto
                                           })
                                .ToList()
                                : new List<PadronViewModel.ElectorViewModel>(),
-                       Colegio = colegio,
+                       Colegio = colegio != null ? colegio.Nombre : null,
                        Usuario = colegio != null ? usuario : null
                    };
         }
@@ -118,7 +115,7 @@ namespace SeguimientoEleccion.Web.Controllers
             var electores = db.Electores.Where(e => ids.Contains(e.Id));
             foreach (var elector in electores)
             {
-                elector.Punteado = punteos.Single(p=>p.Key == elector.Id).Value;
+                elector.Voto = punteos.Single(p=>p.Key == elector.Id).Value;
             }
 
             db.SaveChanges();

@@ -204,8 +204,8 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EstadisticasController.cs" />
     <Compile Include="Controllers\CentralController.cs" />
-    <Compile Include="Controllers\ElectoresController.cs" />
     <Compile Include="Controllers\FiscalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -262,6 +262,18 @@
     <Compile Include="Migrations\201409190224427_DniInt.Designer.cs">
       <DependentUpon>201409190224427_DniInt.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201409192000234_punteos.cs" />
+    <Compile Include="Migrations\201409192000234_punteos.Designer.cs">
+      <DependentUpon>201409192000234_punteos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409192018265_ColegioId.cs" />
+    <Compile Include="Migrations\201409192018265_ColegioId.Designer.cs">
+      <DependentUpon>201409192018265_ColegioId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409192036228_EliminarPunteo.cs" />
+    <Compile Include="Migrations\201409192036228_EliminarPunteo.Designer.cs">
+      <DependentUpon>201409192036228_EliminarPunteo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CentralIndexViewModel.cs" />
@@ -279,13 +291,16 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\kendo.common.min.css" />
+    <Content Include="Content\kendo.dataviz.bootstrap.min.css" />
+    <Content Include="Content\kendo.dataviz.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\App\Central\PunteoPorColegio.js" />
+    <Content Include="Scripts\App\Central\Votacion.js" />
     <Content Include="Scripts\App\Data\dataContext.js" />
-    <Content Include="Scripts\App\Data\seguimientoEleccion.js" />
-    <Content Include="Scripts\App\Fiscal\Index - Copy.js" />
     <Content Include="Scripts\App\Fiscal\Index.js" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -305,6 +320,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\kendo.dataviz.min.js" />
     <Content Include="Scripts\knockout-3.2.0.debug.js" />
     <Content Include="Scripts\knockout-3.2.0.js" />
     <Content Include="Scripts\knockout.mapping-latest.debug.js" />
@@ -360,6 +376,9 @@
     <Content Include="Views\Central\VerPunteados.cshtml" />
     <Content Include="Views\Central\VerTodos.cshtml" />
     <Content Include="Views\Shared\_LayoutNoCache.cshtml" />
+    <Content Include="Views\Central\ListadoTotalesPorColegio.cshtml" />
+    <Content Include="Views\Central\Votacion.cshtml" />
+    <Content Include="Views\Central\PunteoPorColegio.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -403,6 +422,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201409190224427_DniInt.resx">
       <DependentUpon>201409190224427_DniInt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409192000234_punteos.resx">
+      <DependentUpon>201409192000234_punteos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409192018265_ColegioId.resx">
+      <DependentUpon>201409192018265_ColegioId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409192036228_EliminarPunteo.resx">
+      <DependentUpon>201409192036228_EliminarPunteo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

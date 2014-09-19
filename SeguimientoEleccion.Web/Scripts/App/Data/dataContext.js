@@ -50,7 +50,7 @@
             if (actualizandoDatos) return;
 
             var ids = entities.map(function (e) {
-                return { Key: e.Id, Value: e.Punteado };
+                return { Key: e.Id, Value: e.Voto };
             });
             return $.ajax(urls.update, {
                 type: 'PUT',
@@ -89,7 +89,7 @@
                     cambiosPendientes.forEach(function(p) {
                         var toUpdate = attachOrGet(p);
                         toUpdate.InSync = p.InSync;
-                        toUpdate.Punteado = p.Punteado;
+                        toUpdate.Voto = p.Voto;
                     });
                     saveLocal();
                     raiseDataUpdated(database);

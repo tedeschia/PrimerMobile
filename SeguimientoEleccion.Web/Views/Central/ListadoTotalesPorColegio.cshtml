@@ -1,0 +1,45 @@
+﻿@model IEnumerable<SeguimientoEleccion.Web.Models.CentralIndexViewModel>
+@{
+    Layout = "~/Views/Shared/_LayoutNoCache.cshtml";
+    ViewBag.Title = "Ver Punteados";
+}
+
+<div class="page-header">
+    <h4>Central</h4>
+</div>
+
+<div id="chart"></div>
+
+<table class="table table-condensed table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Colegio)
+            </th>
+            <th>
+                <p class="text-center">@Html.DisplayNameFor(model => model.Punteados) / Total</p>
+            </th>
+            <th>Ver</th>
+        </tr>
+    </thead>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Colegio)
+            </td>
+            <td>
+                <p class="text-center">@Html.DisplayFor(modelItem => item.Punteados) / @Html.DisplayFor(modelItem => item.Electores)</p>
+            </td>
+            <td>
+                @Html.ActionLink("Punteados", "VerPunteados", new { colegio = item.Colegio })
+                @Html.ActionLink("Todos", "VerTodos", new { colegio = item.Colegio })
+            </td>
+        </tr>
+    }
+    
+    @section scripts
+    {
+        @Scripts.Render("~/bundles/kendo.dataviz")
+    }
+</table>

@@ -10,5 +10,6 @@ namespace SeguimientoEleccion.Web.Models
         public int Id { get; set; }
         public string Nombre { get; set; }
         public string Usuario { get; set; }
+        public ICollection<Elector> Electores { get; set; }
     }
 }

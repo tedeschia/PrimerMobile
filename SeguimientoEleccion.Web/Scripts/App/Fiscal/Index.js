@@ -73,7 +73,7 @@
         //keyboard
         keyboard.puedeAutomarcar = ko.computed(function () {
             if (resultadoBusqueda().length == 1) {
-                if (resultadoBusqueda()[0].Punteado) {
+                if (resultadoBusqueda()[0].Voto) {
                     utils.showMessage(messages.yaEstaPunteado, [resultadoBusqueda()[0].DNI]);
                     return false;
 
@@ -87,8 +87,8 @@
         keyboard.automarcar = function () {
             if (!keyboard.puedeAutomarcar()) return;
             var elector = ko.utils.unwrapObservable(resultadoBusqueda)[0];
-            if (!elector.Punteado) {
-                elector.PunteadoObservable(true);
+            if (!elector.Voto) {
+                elector.VotoObservable(true);
                 id('');
             }
         };
@@ -102,15 +102,15 @@
                         e.InSync = value;
                     });
                     e.InSyncObservable.extend({ rateLimit: 1000 });
-                    e.PunteadoObservable = ko.observable(e.Punteado);
-                    e.PunteadoObservable.subscribe(function(value) {
-                        e.Punteado = value;
+                    e.VotoObservable = ko.observable(e.Voto);
+                    e.VotoObservable.subscribe(function(value) {
+                        e.Voto = value;
                         if (!e.InSyncObservable()) {
                             //si no estaba sync cancelo el cambio pendiente
                             dataPadron.cancelUpdate([e]);
                         } else {
-                            if (e.Punteado) {
-                                utils.showMessage(messages.punteado, [e.DNI]);
+                            if (e.Voto) {
+                                utils.showMessage(messages.Voto, [e.DNI]);
                             }
                             dataPadron.update([e]);
                         }

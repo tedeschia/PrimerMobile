@@ -33,5 +33,6 @@ namespace SeguimientoEleccion.Web.Models
 
         public System.Data.Entity.DbSet<SeguimientoEleccion.Web.Models.Elector> Electores { get; set; }
         public System.Data.Entity.DbSet<SeguimientoEleccion.Web.Models.Colegio> Colegios { get; set; }
+
     }
 }

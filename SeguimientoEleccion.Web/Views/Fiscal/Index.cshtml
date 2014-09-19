@@ -6,7 +6,6 @@
     <div class="col-xs-12">
         <h4 class="pull-left">DNI</h4>
         <button class=" pull-right btn btn-default btn-sm" data-bind="click:cambiarColegio, text: colegio, visible:colegio()"></button>
-        @*<h5 class="pull-right" data-bind="text:colegio, visible:colegio()"></h5>*@
     </div>
 </div>
 
@@ -75,8 +74,7 @@
                                 <td data-bind="text: DNI"></td>
                                 <td data-bind="text: Nombre"></td>
                                 <td>
-                                    @*<input type="checkbox" data-bind="enable:typeof(InSyncObservable)=='undefined' || InSyncObservable(), checked: PunteadoObservable, attr: {id: 'punteado_' + Id }" />*@
-                                    <input type="checkbox" data-bind="checked: PunteadoObservable, attr: {id: 'punteado_' + Id }" />
+                                    <input type="checkbox" data-bind="checked: VotoObservable" />
                                 </td>
                                 <td>
                                     <span data-bind="visible:!(typeof(InSyncObservable)=='undefined' || InSyncObservable())"><i class="glyphicon glyphicon-cloud-upload"></i></span>
