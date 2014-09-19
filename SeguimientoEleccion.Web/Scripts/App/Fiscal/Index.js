@@ -6,20 +6,20 @@
             id = ko.observable(''),
             cambiosPendientes = ko.observable(),
             enviandoPendientes = ko.observable(false),
-            keyboard = {
-                
-            },
+            keyboard = {},
             tecladoNumericoActivo = ko.observable(utils.is_touch_device),
             messages = {
                 ingresarDni: { msg: 'Ingresar DNI', status: 'info' },
                 noEncontrado: { msg: 'No se encontró el DNI', status: 'danger' },
                 minNumeros: { msg: 'La busqueda comienza cuando hay 3 dígitos', status: 'warning' },
-                punteado: { msg: 'Punteado!', status: 'success' },
+                punteado: { msg: '<strong>{0}</strong> punteado!', status: 'success' },
                 masDe10: { msg: 'Mas de 10 electores encontrados', status: 'info' },
                 resultadosMostrados: { msg: 'Resultados encontrados', status: 'info' },
                 listoParaPuntear: { msg: tecladoNumericoActivo() ? 'Listo para puntear <strong>{0}</strong>!' : 'Enter para puntear <strong>{0}</strong>!', status: 'success' },
+                yaEstaPunteado: { msg:'El DNI <strong>{0}</strong> ya está punteado!', status: 'warning' },
                 errorLogin: { msg: 'Error: {0}', status: 'danger' },
                 cambiarColegio: { msg: 'Cambiar Colegio', status: 'info' },
+                sincronizado: { msg: 'Datos enviados!', status: 'success' },
             },
             cambiandoUsuario = ko.observable(false),
             inicializandoApp = ko.observable(true),
@@ -72,20 +72,25 @@
 
         //keyboard
         keyboard.puedeAutomarcar = ko.computed(function () {
-            var resultado = resultadoBusqueda().length == 1;
-            if (resultado) {
-                utils.showMessage(messages.listoParaPuntear, [resultadoBusqueda()[0].DNI]);
+            if (resultadoBusqueda().length == 1) {
+                if (resultadoBusqueda()[0].Punteado) {
+                    utils.showMessage(messages.yaEstaPunteado, [resultadoBusqueda()[0].DNI]);
+                    return false;
+
+                } else {
+                    utils.showMessage(messages.listoParaPuntear, [resultadoBusqueda()[0].DNI]);
+                    return true;
+                }
             }
-            return resultado;
+            return false;
         });
         keyboard.automarcar = function () {
+            if (!keyboard.puedeAutomarcar()) return;
             var elector = ko.utils.unwrapObservable(resultadoBusqueda)[0];
-            elector.PunteadoObservable(true);
-            //elector.Punteado = true;
-            //$('#punteado_' + elector.Id).prop('checked', true);
-            //guardarPuntear(elector);
-            utils.showMessage(messages.punteado);
-
+            if (!elector.Punteado) {
+                elector.PunteadoObservable(true);
+                id('');
+            }
         };
 
 
@@ -104,7 +109,9 @@
                             //si no estaba sync cancelo el cambio pendiente
                             dataPadron.cancelUpdate([e]);
                         } else {
-                            //si estaba pendiente y se volvió al estado de punteado anterior lo saco de pendiente
+                            if (e.Punteado) {
+                                utils.showMessage(messages.punteado, [e.DNI]);
+                            }
                             dataPadron.update([e]);
                         }
                     });
@@ -160,6 +167,9 @@
         function enviarPendientes() {
             enviandoPendientes(true);
             dataPadron.savePendientes()
+                .done(function() {
+                    utils.showMessage(messages.sincronizado);
+                })
                 .always(function() {
                     enviandoPendientes(false);
                 });

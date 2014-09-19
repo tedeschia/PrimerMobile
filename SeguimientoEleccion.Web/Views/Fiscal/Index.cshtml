@@ -1,10 +1,10 @@
 ﻿@{
-    ViewBag.Title = "Elección 2014 - FISCAL";
+    ViewBag.Title = "FISCAL";
 }
 
 <div class="row">
     <div class="col-xs-12">
-        <h4 class="pull-left">Fiscal  </h4>
+        <h4 class="pull-left">DNI</h4>
         <button class=" pull-right btn btn-default btn-sm" data-bind="click:cambiarColegio, text: colegio, visible:colegio()"></button>
         @*<h5 class="pull-right" data-bind="text:colegio, visible:colegio()"></h5>*@
     </div>
@@ -99,15 +99,15 @@
 <script id="inputKeyboard" type="text/html">
     <form class="" data-bind="submit: keyboard.automarcar">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-xs-8">
                 <div class="input-group">
                     <input class="form-control" type="number" data-bind="textInput: id" />
                     <span class="input-group-btn">
-                        <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar, css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok"></i></button>
+                        <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar, css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok" data-bind="css:keyboard.puedeAutomarcar()?'icon-active':'icon-disabled'"></i></button>
                     </span>
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-xs-4">
                 <button type="button" class="btn btn-warning pull-left" data-bind="visible:cambiosPendientes()>0, enable:!enviandoPendientes() ,click:enviarPendientes"><span class="glyphicon glyphicon-cloud-upload"></span><span data-bind="text: ' ' + cambiosPendientes()"></span></button>
             </div>
         </div>
@@ -178,5 +178,8 @@
 
     .numero-actual {
         margin: 5px 0;
+    }
+    .icon-disabled {
+        color: #dddddd;
     }
 </style>

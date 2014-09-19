@@ -13,7 +13,6 @@
                 descargandoDatos: { msg: 'Descargando datos (puede demorar) ...', status: 'info' },
                 preparandoDatos: { msg: 'Datos descargados, preparando ...', status: 'info' },
                 datosActualizados: { msg: 'Datos actualizados', status: 'info' },
-                sincronizado: { msg: 'Datos enviados!', status: 'success' },
             },
             cantidadCambiosPendientes = 0;
 
@@ -61,7 +60,6 @@
                 entities.forEach(function(e) { setInSync(e, true); });
                 saveLocal();
                 addCantidadCambiosPendientes(-entities.length);
-                utils.showMessage(messages.sincronizado);
             });
         }
         function cancelUpdate(entities) {
