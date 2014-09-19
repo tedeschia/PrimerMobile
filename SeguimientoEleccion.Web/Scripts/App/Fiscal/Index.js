@@ -1,57 +1,80 @@
 ﻿(function (dataPadron, utils) {
-    var vm = function() {
+    var vm = function () {
 
         var colegio = ko.observable(),
+            usuario = ko.observable(),
             id = ko.observable(''),
-            settings = {},
+            cambiosPendientes = ko.observable(),
+            enviandoPendientes = ko.observable(false),
             keyboard = {
+                
             },
-            message = ko.observable(''),
-            messageStatus = ko.observable('info'),
+            tecladoNumericoActivo = ko.observable(utils.is_touch_device),
             messages = {
-                ingresarDni: { msg:'Ingresar DNI', status:'info' },
+                ingresarDni: { msg: 'Ingresar DNI', status: 'info' },
                 noEncontrado: { msg: 'No se encontró el DNI', status: 'danger' },
                 minNumeros: { msg: 'La busqueda comienza cuando hay 3 dígitos', status: 'warning' },
                 punteado: { msg: 'Punteado!', status: 'success' },
-                masDe10: { msg:'Mas de 10 electores encontrados' ,status:'info'},
-                resultadosMostrados: { msg:'Resultados encontrados' ,status:'info'},
-                listoParaPuntear: { msg:'Listo para puntear!' ,status:'success'}
+                masDe10: { msg: 'Mas de 10 electores encontrados', status: 'info' },
+                resultadosMostrados: { msg: 'Resultados encontrados', status: 'info' },
+                listoParaPuntear: { msg: tecladoNumericoActivo() ? 'Listo para puntear <strong>{0}</strong>!' : 'Enter para puntear <strong>{0}</strong>!', status: 'success' },
+                errorLogin: { msg: 'Error: {0}', status: 'danger' },
+                cambiarColegio: { msg: 'Cambiar Colegio', status: 'info' },
             },
-            cargaFinalizada = ko.observable(false),
-            electores = ko.observableArray();
+            cambiandoUsuario = ko.observable(false),
+            inicializandoApp = ko.observable(true),
+            electores = ko.observableArray(),
+            usuarioAnterior = '',
+            colegioAnterior = '';
 
-        var resultadoBusqueda = ko.computed(function() {
+        dataPadron.init()
+            .done(function() {
+                inicializandoApp(false);
+                if (colegio()) {
+                    utils.showMessage(messages.ingresarDni);
+                }
+            });
+        dataPadron.onDataUpdated = function (data) {
+            electores(data.Padron);
+            colegio(data.Colegio);
+            usuario(data.Usuario);
+        };
+        cambiosPendientes.extend({ rateLimit: 1000 });
+        dataPadron.cambiosPendientesObservable = cambiosPendientes;
+
+
+        var resultadoBusqueda = ko.computed(function () {
             var dni = id(),
                 resultado = [];
             if (dni && dni.length > 2) {
-                resultado = electores().filter(function(elector) {
-                    return elector.DNI && elector.DNI.substring(0, dni.length) == dni;
+                resultado = electores().filter(function (elector) {
+                    return elector.DNI && elector.DNI.toString().substring(0, dni.length) == dni;
                 });
                 if (resultado.length > 10) {
-                    showMessage(messages.masDe10);
+                    utils.showMessage(messages.masDe10);
                     return [];
                 } else {
                     if (resultado.length > 0) {
-                        showMessage(messages.resultadosMostrados);
+                        utils.showMessage(messages.resultadosMostrados);
                     } else {
-                        showMessage(messages.noEncontrado);
+                        utils.showMessage(messages.noEncontrado);
                     }
                     addObservables(resultado);
                     return resultado;
                 }
-            } else {
-                showMessage(messages.minNumeros);
-                return [];
+            } else if(dni) {
+                utils.showMessage(messages.minNumeros);
             };
-            
+            return [];
+
         });
-        resultadoBusqueda.extend({rateLimit:500});
+        resultadoBusqueda.extend({ rateLimit: 500 });
 
         //keyboard
         keyboard.puedeAutomarcar = ko.computed(function () {
             var resultado = resultadoBusqueda().length == 1;
             if (resultado) {
-                showMessage(messages.listoParaPuntear);
+                utils.showMessage(messages.listoParaPuntear, [resultadoBusqueda()[0].DNI]);
             }
             return resultado;
         });
@@ -61,31 +84,10 @@
             //elector.Punteado = true;
             //$('#punteado_' + elector.Id).prop('checked', true);
             //guardarPuntear(elector);
-            showMessage(messages.punteado);
+            utils.showMessage(messages.punteado);
 
         };
 
-        dataPadron.ready
-            .done(function () {
-                electores(dataPadron.getData());
-                cargaFinalizada(true);
-            });
-        dataPadron.onDataUpdated = function (data) {
-            electores(data);
-        };
-        dataPadron.onDataSync = function (data) {
-            //var target = ko.utils.unwrapObservable(electores);
-            data.forEach(function(e) {
-                //var toUpdate = target.filter(function (t) { return t.Id == e.Id; });
-                //if (toUpdate) {
-                    if (e.InSyncObservable) {
-                        e.InSyncObservable(true);
-                    } else {
-                        e.InSync = true;
-                    }
-                //}
-            });
-        };
 
         function addObservables(array) {
             array.forEach(function (e) {
@@ -94,44 +96,22 @@
                     e.InSyncObservable.subscribe(function (value) {
                         e.InSync = value;
                     });
+                    e.InSyncObservable.extend({ rateLimit: 1000 });
                     e.PunteadoObservable = ko.observable(e.Punteado);
-                    e.PunteadoObservable.subscribe(function (value) {
+                    e.PunteadoObservable.subscribe(function(value) {
                         e.Punteado = value;
-                        //si estaba pendiente y se volvió al estado de punteado anterior lo saco de pendiente
-                        e.InSyncObservable(!e.InSyncObservable());
-                        dataPadron.update([e]);
+                        if (!e.InSyncObservable()) {
+                            //si no estaba sync cancelo el cambio pendiente
+                            dataPadron.cancelUpdate([e]);
+                        } else {
+                            //si estaba pendiente y se volvió al estado de punteado anterior lo saco de pendiente
+                            dataPadron.update([e]);
+                        }
                     });
                 }
             });
 
         }
-        //function puntear(elector, event) {
-        //    //elector.Punteado = $(event.target).prop('checked');
-        //    guardarPuntear(elector);
-        //    return true;
-        //}
-        //function guardarPuntear(elector) {
-        //    setSync(elector,false);
-        //    var pendientes = electores.filter(function (p) { return p.InSync != undefined && !p.InSync; });
-        //    dataPadron.update(pendientes)
-        //        .done(function() {
-        //            pendientes.forEach(function (p) { setSync(p, true); });
-        //        });
-        //}
-        
-        //function setSync(entity, status) {
-        //    if (!entity.InSyncObservable) {
-        //        entity.InSyncObservable = ko.computed({
-        //            read: function() {
-        //                return this.InSync == undefined || this.InSync;
-        //            },
-        //            write: function(value) {
-        //                this.InSync = value;
-        //            }
-        //        }, entity);
-        //    }
-        //    entity.InSyncObservable(status);
-        //}
 
         function initKeyboard(elements) {
             var keyboard = $(elements).find('#keyboard'),
@@ -140,7 +120,7 @@
                 var element = keyboard.get(0);
                 FastClick.attach(element);
             });
-            keyboard.find('.key-numero').click(function(e) {
+            keyboard.find('.key-numero').click(function (e) {
                 var btn = $(e.target),
                     numero = btn.attr('value');
                 var dni = id() || '';
@@ -155,25 +135,51 @@
                 id('');
             });
         };
-        
-        //mensajes
-        showMessage(messages.ingresarDni);
-        
-        function showMessage(msg) {
-            message(msg.msg);
-            messageStatus(msg.status);
+
+        function login() {
+            cambiandoUsuario(true);
+            dataPadron.changeUser(usuario())
+                .fail(function(e) {
+                    utils.showMessage(messages.errorLogin, [e]);
+                }).always(function() {
+                    cambiandoUsuario(false);
+                });
+        }
+        function cambiarColegio() {
+            usuarioAnterior = usuario();
+            colegioAnterior = colegio();
+            usuario('');
+            colegio('');
+            utils.showMessage(messages.cambiarColegio);
+        }
+        function cancelarCambioColegio() {
+            usuario(usuarioAnterior);
+            colegio(colegioAnterior);
         }
 
+        function enviarPendientes() {
+            enviandoPendientes(true);
+            dataPadron.savePendientes()
+                .always(function() {
+                    enviandoPendientes(false);
+                });
+        }
         return {
-            cargaFinalizada: cargaFinalizada,
+            inicializandoApp: inicializandoApp,
+            cambiandoUsuario: cambiandoUsuario,
             id: id,
             resultadoBusqueda: resultadoBusqueda,
-            //puntear: puntear,
-            touchDevice: utils.is_touch_device(),
+            cambiosPendientes: cambiosPendientes,
+            enviarPendientes: enviarPendientes,
+            enviandoPendientes: enviandoPendientes,
+            tecladoNumericoActivo: tecladoNumericoActivo,
             initTouchKeyboard: initKeyboard,
             keyboard: keyboard,
-            message: message,
-            messageStatus: messageStatus
+            login: login,
+            usuario: usuario,
+            colegio: colegio,
+            cambiarColegio: cambiarColegio,
+            cancelarCambioColegio: cancelarCambioColegio
         };
     };
 

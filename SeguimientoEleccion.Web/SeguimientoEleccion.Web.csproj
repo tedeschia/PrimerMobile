@@ -246,6 +246,22 @@
     <Compile Include="Migrations\201409171358119_Colegios.Designer.cs">
       <DependentUpon>201409171358119_Colegios.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201409181917538_UsuarioColegio.cs" />
+    <Compile Include="Migrations\201409181917538_UsuarioColegio.Designer.cs">
+      <DependentUpon>201409181917538_UsuarioColegio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409182008218_ElectorMesa.cs" />
+    <Compile Include="Migrations\201409182008218_ElectorMesa.Designer.cs">
+      <DependentUpon>201409182008218_ElectorMesa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409182157575_DniAInt1.cs" />
+    <Compile Include="Migrations\201409182157575_DniAInt1.Designer.cs">
+      <DependentUpon>201409182157575_DniAInt1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201409190224427_DniInt.cs" />
+    <Compile Include="Migrations\201409190224427_DniInt.Designer.cs">
+      <DependentUpon>201409190224427_DniInt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CentralIndexViewModel.cs" />
@@ -375,6 +391,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201409171358119_Colegios.resx">
       <DependentUpon>201409171358119_Colegios.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409181917538_UsuarioColegio.resx">
+      <DependentUpon>201409181917538_UsuarioColegio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409182008218_ElectorMesa.resx">
+      <DependentUpon>201409182008218_ElectorMesa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409182157575_DniAInt1.resx">
+      <DependentUpon>201409182157575_DniAInt1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201409190224427_DniInt.resx">
+      <DependentUpon>201409190224427_DniInt.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

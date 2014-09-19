@@ -1,6 +1,6 @@
-﻿DATACONTEXT = function () {
+﻿DATACONTEXT = function (utils) {
 
-    var DataSourcePadron = function() {
+    var DataSourcePadron = function () {
         var ns = this,
             dataKey = 'eleccion2014',
             database = {},
@@ -8,122 +8,155 @@
                 getAll: 'api/Padron',
                 update: 'api/Padron/puntear'
             },
-            ready = false,
-            readyDeferred = $.Deferred(),
-            actualizandoDatos;
+            actualizandoDatos,
+            messages = {
+                descargandoDatos: { msg: 'Descargando datos (puede demorar) ...', status: 'info' },
+                preparandoDatos: { msg: 'Datos descargados, preparando ...', status: 'info' },
+                datosActualizados: { msg: 'Datos actualizados', status: 'info' },
+                sincronizado: { msg: 'Datos enviados!', status: 'success' },
+            },
+            cantidadCambiosPendientes = 0;
+
+
+        function init() {
+            var initDeferred = $.Deferred();
+            setTimeout(function() {
+                database = readLocal();
+                if (database.Colegio) {
+                    var cambiosPendientes = database.Padron.filter(function (p) { return p.InSync != undefined && !p.InSync; });
+                    setCantidadCambiosPendientes(cambiosPendientes.length);
+
+                    raiseDataUpdated(database);
+                    refreshData(database.Usuario);
+                }
+                initDeferred.resolve();
+            }, 1);
+
+            return initDeferred.promise();
+
+        }
 
         function update(entities) {
+            //cuento los nuevos pendientes y notifico
+            var pendientesNuevos = entities.filter(function (e) {
+                return e.InSync == undefined || e.InSync;
+            }).length;
+            addCantidadCambiosPendientes(pendientesNuevos);
+            //marco todos como pendiente
+            entities.forEach(function (e) { setInSync(e, false); });
+
+            saveLocal();
+
             //si estoy en proceso de traer datos del server no mando actualizaciones
             if (actualizandoDatos) return;
-            var ids = [];
 
-            entities.forEach(function(e) {
-                //var toUpdate = attachOrGet(e);
-                //toUpdate.Punteado = e.Punteado;
-                //e.InSyncObservable(false);
-                ids.push({ Key: e.Id, Value: e.Punteado });
+            var ids = entities.map(function (e) {
+                return { Key: e.Id, Value: e.Punteado };
             });
-            saveLocal();
-            $.ajax(urls.update, {
+            return $.ajax(urls.update, {
                 type: 'PUT',
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(ids)
-            }).done(function (data) {
+            }).done(function(data) {
+                entities.forEach(function(e) { setInSync(e, true); });
                 saveLocal();
-                if (typeof ns.onDataSync == 'function') {
-                    ns.onDataSync(entities);
-                }
+                addCantidadCambiosPendientes(-entities.length);
+                utils.showMessage(messages.sincronizado);
             });
         }
-
-        loadData();
-        
-        function loadData() {
-            database = readLocal();
-            if (database.Padron.length > 0) {
-                readyDeferred.resolve();
+        function cancelUpdate(entities) {
+            entities.forEach(function (e) { setInSync(e, true); });
+            addCantidadCambiosPendientes(-entities.length);
+            saveLocal();
+        }
+        function setInSync(e,value) {
+            if (e.InSyncObservable) {
+                e.InSyncObservable(value);
+            } else {
+                e.InSync = value;
             }
-
-            var fechaUltimaActualizacion = (database && database.FechaUltimaActualizacion) ? database.FechaUltimaActualizacion : '';
-
+        }
+        function refreshData(usuario) {
             actualizandoDatos = true;
-            $.get(urls.getAll + '/' + fechaUltimaActualizacion)
+            utils.showMessage(messages.descargandoDatos);
+
+
+            return $.get(urls.getAll + '/' + usuario)
                 .done(function (data) {
-                    //vino null porque no hubieron modificaciones. CACHE MANUAL "CASERITO!!"
-                    if (data) {
-                        var pending = [];
-                        if (database.Padron) {
-                            pending = database.Padron.filter(function (p) { return p.InSync != undefined && !p.InSync; });
-                        }
-                        database = data;
-                        pending.forEach(function (p) {
-                            var toUpdate = attachOrGet(p);
-                            toUpdate.InSync = p.InSync;
-                            toUpdate.Punteado = p.Punteado;
-                        });
-                        saveLocal();
-                        raiseDataUpdated(database.Padron);
-                    }
+                    utils.showMessage(messages.preparandoDatos);
+                    
+                    var cambiosPendientes = database.Padron ? database.Padron.filter(function(p) { return p.InSync != undefined && !p.InSync; }) : [];
+                    setCantidadCambiosPendientes(cambiosPendientes.length);
+                    database = data;
+                    cambiosPendientes.forEach(function(p) {
+                        var toUpdate = attachOrGet(p);
+                        toUpdate.InSync = p.InSync;
+                        toUpdate.Punteado = p.Punteado;
+                    });
+                    saveLocal();
+                    raiseDataUpdated(database);
 
                 }).always(function () {
                     actualizandoDatos = false;
                     savePendientes();
-                    if (readyDeferred.state()=="pending") {
-                        readyDeferred.resolve();
-                    }
+                    utils.showMessage(messages.datosActualizados);
                 });
         }
 
+        function changeUser(usuario) {
+            var deferred = $.Deferred();
+            refreshData(usuario)
+                .done(function() {
+                    if (!database.Usuario) {
+                        deferred.reject('Usuario inválido');
+                    } else {
+                        deferred.resolve();
+                    }
+                }).fail(function(e) {
+                    deferred.reject('No se pudo ingresar, posiblemente por fallas de conexión');
+                });
+            return deferred.promise();
+        }
         function raiseDataUpdated(padron) {
             if (typeof ns.onDataUpdated === "function") {
                 //setTimeout(ns.onDataUpdated(padron), 1);
                 ns.onDataUpdated(padron);
             }
         }
-        
-        function savePendientes() {
-            var pendientes = database.Padron.filter(function (p) { return p.InSync != undefined && !p.InSync; });
-            if (pendientes.length > 0) {
-                update(pendientes);
-            }
-        }
 
-        function addObservables(padron) {
-            padron.forEach(function(e) {
-                e.InSyncObservable = ko.observable((e.InSync == undefined) || e.InSync);
-                e.InSyncObservable.subscribe(function (value) {
-                    e.InSync = value;
-                });
-                e.PunteadoObservable = ko.observable(e.Punteado);
-                e.PunteadoObservable.subscribe(function (value) {
-                    e.Punteado = value;
-                    //si estaba pendiente y se volvió al estado de punteado anterior lo saco de pendiente
-                    e.InSyncObservable(!e.InSyncObservable());
-                    update([e]);
-                });
-            });
+        function savePendientes() {
+            var deferred = $.Deferred();
+            var cambiosPendientes = database.Padron ? database.Padron.filter(function (p) { return p.InSync != undefined && !p.InSync; }) : [];
+            if (cambiosPendientes.length > 0) {
+                update(cambiosPendientes)
+                    .done(function(d) { deferred.resolve(d); })
+                    .fail(function(d) { deferred.reject(d); });
+            }
+            return deferred.promise();
         }
 
         function saveLocal() {
-            //var data = JSON.stringify(database);
-            //localStorage.setItem(dataKey+".Padron",database.Padron);
+            var data = JSON.stringify(database);
+            localStorage.setItem(dataKey, data);
         }
 
         function readLocal() {
-            var padron = [];
-            //try {
-            //    var data = JSON.parse(localStorage.getItem(dataKey+".Padron"));
-            //    if (!data) throw 'Invalid data in storage';
-            //    padron = data;
-            //} catch(e) {
-            //    //return {
-            //    //    Padron: [],
-            //    //    FechaUltimaActualizacion: ''
-            //    //};
-            //}
+            var padron = [],
+                colegio = '',
+                usuario = '';
+            try {
+                var data = JSON.parse(localStorage.getItem(dataKey));
+                if (data && data.Padron && data.Colegio && data.Usuario) {
+                    padron = data.Padron;
+                    colegio = data.Colegio;
+                    usuario = data.Usuario;
+                }
+            } catch (e) {
+            }
             return {
                 Padron: padron,
-                FechaUltimaActualizacion: ''
+                Colegio: colegio,
+                Usuario: usuario
             };
         }
 
@@ -137,59 +170,41 @@
         }
 
         function find(id) {
-            var result = database.Padron.filter(function(p) { return p.Id == id; });
+            var result = database.Padron.filter(function (p) { return p.Id == id; });
             if (result.length > 0) {
                 return result[0];
             }
             return null;
         }
+        
+        function setCantidadCambiosPendientes(cantidad) {
+            cantidadCambiosPendientes = cantidad;
+            addCantidadCambiosPendientes(0);
+        }
+        function addCantidadCambiosPendientes(delta) {
+            cantidadCambiosPendientes += delta;
+            if (typeof ns.cambiosPendientesObservable === "function") {
+                ns.cambiosPendientesObservable(cantidadCambiosPendientes);
+            }
+        };
 
-        ns.ready = readyDeferred
-            .done(function() {
-                ready = true;
-            }).promise();
-        ns.getData = function() {
+        ns.getData = function () {
             return database.Padron;
         };
         ns.savePendientes = savePendientes;
         ns.update = update;
+        ns.cancelUpdate = cancelUpdate;
         ns.onDataUpdated = undefined;
-        ns.onDataSync = undefined;
-    };
-
-    var DataSourceSettings = function () {
-        var ns = this,
-            urls = {
-                get: 'api/settings/servicio',
-                set: 'api/settings/servicio',
-            },
-            ready = false;
-
-        ns.set = function (settings) {
-
-            return $.ajax(urls.set, {
-                type: 'PUT',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(settings)
-            }).fail(function (data) {
-                console.log(data.message);
-            });
-        };
-
-        ns.get = function () {
-            return $.get(urls.get)
-                .fail(function (data) {
-                    console.log(data.responseText);
-                });
-        };
+        ns.changeUser = changeUser;
+        ns.init = init;
+        ns.cambiosPendientesObservable = undefined;
     };
 
     var ns = this;
     ns.data = new DataSourcePadron();
-    ns.settings = new DataSourceSettings();
-    
+
     return ns;
-}();
+}(APP.utils);
 
 
 

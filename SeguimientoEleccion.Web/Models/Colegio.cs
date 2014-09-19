@@ -9,7 +9,6 @@ namespace SeguimientoEleccion.Web.Models
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-        public DateTime UltimaActualizacionPadron { get; set; }
-
+        public string Usuario { get; set; }
     }
 }

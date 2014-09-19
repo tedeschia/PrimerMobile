@@ -20,21 +20,32 @@ namespace SeguimientoEleccion.Web.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/Padron
-        [System.Web.Http.Route("{lastUpdate:datetime?}")]
+        [System.Web.Http.Route("{usuario}")]
         [ValidateInput(false)]
-        public PadronViewModel GetPadron(DateTime? lastUpdate = null)
+        public PadronViewModel GetPadron(string usuario)
         {
             //Thread.Sleep(10000);
-            var colegios = db.Colegios.Select(c=>c.Nombre);
-            var minDate = DateTime.MinValue;
-            var ultimaActualizacion = db.Colegios.Max(c=>c.UltimaActualizacionPadron);
-            //if (ultimaActualizacion <= lastUpdate)
-            //    throw new HttpResponseException(HttpStatusCode.NotModified);
+            var colegio = db.Colegios
+                .Where(c=>c.Usuario == usuario)
+                .Select(c=>c.Nombre)
+                .FirstOrDefault();
 
             return new PadronViewModel()
                    {
-                       FechaUltimaActualizacion = ultimaActualizacion,
-                       Padron = db.Electores.Where(e => colegios.Contains(e.Colegio))
+                       Padron =
+                           colegio != null
+                               ? db.Electores.Where(e => colegio == e.Colegio)
+                               .Select(e=>new PadronViewModel.ElectorViewModel()
+                                          {
+                                              Id=e.Id,
+                                              Nombre = e.Nombre,
+                                              DNI = e.DNI,
+                                              Punteado = e.Punteado
+                                          })
+                               .ToList()
+                               : new List<PadronViewModel.ElectorViewModel>(),
+                       Colegio = colegio,
+                       Usuario = colegio != null ? usuario : null
                    };
         }
 
