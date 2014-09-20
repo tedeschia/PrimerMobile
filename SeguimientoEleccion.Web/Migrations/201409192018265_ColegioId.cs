@@ -7,6 +7,10 @@ namespace SeguimientoEleccion.Web.Migrations
     {
         public override void Up()
         {
+            AddColumn("dbo.Electors", "ColegioId", c => c.Int(nullable: false));
+            Sql(@"
+update electors set colegioid = (select id from colegios where nombre = electors.colegio)
+");
             CreateIndex("dbo.Electors", "ColegioId");
             AddForeignKey("dbo.Electors", "ColegioId", "dbo.Colegios", "Id", cascadeDelete: true);
             DropColumn("dbo.Electors", "Colegio");

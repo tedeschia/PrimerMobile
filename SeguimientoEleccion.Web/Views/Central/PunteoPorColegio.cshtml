@@ -3,10 +3,6 @@
     ViewBag.Title = "Estadisticas";
 }
 
-<div class="page-header">
-    <h4>Central</h4>
-</div>
-
 <div class="row">
     <div class="col-md-12">
         <div id="chart"></div>
@@ -15,6 +11,6 @@
 
 
 @section scripts{
-    @Scripts.Render("~/bundles/kendo.dataviz")
+    @Scripts.Render("~/bundles/kendo")
     <script src="~/Scripts/App/Central/PunteoPorColegio.js"></script>
 }

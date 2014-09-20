@@ -3,18 +3,14 @@
     ViewBag.Title = "Estadisticas";
 }
 
-<div class="page-header">
-    <h4>Central</h4>
-</div>
-
 <div class="row">
-    <div class="col-md-12">
+    <div id="chartContainer" class="col-xs-12">
         <div id="chart"></div>
     </div>
 </div>
 
 
 @section scripts{
-    @Scripts.Render("~/bundles/kendo.dataviz")
+    @Scripts.Render("~/bundles/kendo")
     <script src="~/Scripts/App/Central/Votacion.js"></script>
 }

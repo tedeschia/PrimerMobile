@@ -43,9 +43,10 @@ namespace SeguimientoEleccion.Web
 
             bundles.Add(new StyleBundle("~/Content/kendo").Include(
                 "~/Content/kendo.common.min.css",
-                "~/Content/kendo.dataviz.min.css"
+                "~/Content/kendo.dataviz.min.css",
+                "~/Content/kendo.dataviz.bootstrap.min.css"
                 ));
-            bundles.Add(new ScriptBundle("~/bundles/kendo.dataviz").Include(
+            bundles.Add(new ScriptBundle("~/bundles/kendo").Include(
                 "~/Scripts/kendo.dataviz.min.js"
                 ));
 
