@@ -12,7 +12,7 @@
                 ingresarDni: { msg: 'Ingresar DNI', status: 'info' },
                 noEncontrado: { msg: 'No se encontró el DNI', status: 'danger' },
                 minNumeros: { msg: 'La busqueda comienza cuando hay 3 dígitos', status: 'warning' },
-                punteado: { msg: '<strong>{0}</strong> punteado!', status: 'success' },
+                voto: { msg: '<strong>{0}</strong> marcado!', status: 'success' },
                 masDe10: { msg: 'Mas de 10 electores encontrados', status: 'info' },
                 resultadosMostrados: { msg: 'Resultados encontrados', status: 'info' },
                 listoParaPuntear: { msg: tecladoNumericoActivo() ? 'Listo para puntear <strong>{0}</strong>!' : 'Enter para puntear <strong>{0}</strong>!', status: 'success' },
@@ -110,7 +110,7 @@
                             dataPadron.cancelUpdate([e]);
                         } else {
                             if (e.Voto) {
-                                utils.showMessage(messages.Voto, [e.DNI]);
+                                utils.showMessage(messages.voto, [e.DNI]);
                             }
                             dataPadron.update([e]);
                         }

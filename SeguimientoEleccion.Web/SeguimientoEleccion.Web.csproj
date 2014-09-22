@@ -382,6 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Blackberry\" />
     <Folder Include="Views\Offline\" />
     <Folder Include="Views\Settings\" />
   </ItemGroup>

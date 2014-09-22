@@ -144,7 +144,7 @@
                 <div class="input-group">
                     <span class="form-control" data-bind="text: id" ></span>
                     <span class="input-group-btn">
-                        <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar, css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok"></i></button>
+                        <button class="btn" type="submit" data-bind="enable: keyboard.puedeAutomarcar(), css: keyboard.puedeAutomarcar()?'btn-primary':'btn-default'"><i class="glyphicon glyphicon-ok"></i></button>
                     </span>
                 </div>
             </div>
@@ -158,9 +158,10 @@
 
 @section scripts
 {
-    <script src="~/Scripts/App/utils.js"></script>
+    @Scripts.Render("~/bundles/app")
+    @*<script src="~/Scripts/App/utils.js"></script>
     <script src="~/Scripts/App/Data/dataContext.js"></script>
-    <script src="~/Scripts/App/Fiscal/Index.js"></script>
+    <script src="~/Scripts/App/Fiscal/Index.js"></script>*@
 }
 
 <style>

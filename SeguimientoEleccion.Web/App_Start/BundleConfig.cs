@@ -33,8 +33,9 @@ namespace SeguimientoEleccion.Web
                 ));
 
             bundles.Add(new ScriptBundle("~/bundles/app").Include(
+                      "~/Scripts/App/utils.js",
                       "~/Scripts/App/Data/dataContext.js",
-                      "~/Scripts/App/utils.js"
+                      "~/Scripts/App/Fiscal/Index.js"
                       ));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(

@@ -18,7 +18,7 @@ namespace SeguimientoEleccion.Web.Models
             public int Id { get; set; }
             public int DNI { get; set; }
             public string Nombre { get; set; }
-            public bool Punteado { get; set; }
+            public bool Voto { get; set; }
         }
     }
 }

@@ -37,7 +37,7 @@ namespace SeguimientoEleccion.Web.Controllers
                                               Id=e.Id,
                                               Nombre = e.Nombre,
                                               DNI = e.DNI,
-                                              Punteado = e.Voto
+                                              Voto = e.Voto
                                           })
                                .ToList()
                                : new List<PadronViewModel.ElectorViewModel>(),
